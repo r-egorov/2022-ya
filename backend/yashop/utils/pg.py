@@ -2,12 +2,14 @@ import logging
 import os
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Union
+from typing import Union, Callable
 
-from alembic.config import Config
+from fastapi import FastAPI
 from configargparse import Namespace
-
-from sqlalchemy.engine import URL
+from alembic.config import Config
+from sqlalchemy import text
+from sqlalchemy.engine import URL as SaURL
+from sqlalchemy.ext.asyncio import create_async_engine
 
 PROJECT_PATH = Path(__file__).parent.parent.resolve()
 
@@ -20,7 +22,8 @@ CENSORED = '***'
 MAX_QUERY_ARGS = 32767
 MAX_INTEGER = 2147483647
 
-log = logging.getLogger(__name__)
+
+log = logging.getLogger('uvicorn')
 
 
 def make_sqlalchemy_url(
@@ -31,7 +34,7 @@ def make_sqlalchemy_url(
         database: str,
         driver: str = "postgresql+asyncpg",
 ):
-    return URL.create(driver, username, password, host, port, database)
+    return SaURL.create(driver, username, password, host, port, database)
 
 
 def make_alembic_config(cmd_opts: Union[Namespace, SimpleNamespace],
@@ -59,3 +62,36 @@ def make_alembic_config(cmd_opts: Union[Namespace, SimpleNamespace],
         config.set_main_option('sqlalchemy.url', str(db_url))
 
     return config
+
+
+def create_connect_to_db_task(app: FastAPI, args: Namespace) -> Callable:
+    db_url = make_sqlalchemy_url(
+        args.pg_user,
+        args.pg_password,
+        args.pg_host,
+        args.pg_port,
+        args.pg_db,
+    )
+
+    async def connect_to_db_task() -> None:
+        log.info('Connecting to database')
+        engine = create_async_engine(
+            db_url,
+            echo=True,
+            future=True,
+        )
+        async with engine.connect() as conn:
+            await conn.execute(text('SELECT 1;'))
+        log.info('Connected to database')
+        app.state.db = engine
+
+    return connect_to_db_task
+
+
+def create_close_db_connection_task(app: FastAPI) -> Callable:
+    async def close_db_connection_task() -> None:
+        log.info('Disconnecting from database')
+        await app.state.db.dispose()
+        log.info('Disconnected from database')
+
+    return close_db_connection_task
