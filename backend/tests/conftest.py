@@ -3,6 +3,7 @@ import uuid
 from types import SimpleNamespace
 
 import pytest
+from sqlalchemy.engine import URL as SaURL
 from sqlalchemy_utils import create_database, drop_database
 
 from yashop.utils.pg import (
@@ -23,7 +24,7 @@ PG_DB = os.getenv('YASHOP_PG_DB', DEFAULT_PG_DB)
 
 
 @pytest.fixture
-def postgres():
+def postgres() -> SaURL:
     tmp_name = '.'.join([uuid.uuid4().hex, 'pytest'])
     tmp_url = make_sqlalchemy_url(
         username=PG_USER,
@@ -42,7 +43,7 @@ def postgres():
 
 
 @pytest.fixture()
-def alembic_config(postgres):
+def alembic_config(postgres: SaURL):
     cmd_options = SimpleNamespace(config='alembic.ini',
                                   name='alembic',
                                   pg_user=postgres.username,
