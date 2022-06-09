@@ -6,7 +6,7 @@ from fastapi import (
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from yashop.api.schema import ShopUnitImportSchema, ImportSchema
+from yashop.api.schema import ShopUnitImportSchema, ImportSchema, RequestImportsSchema
 from yashop.db.schema import units_table
 
 router = APIRouter()
@@ -28,9 +28,10 @@ def prepare_import_rows(import_: ImportSchema) -> List[Dict]:
 @router.post(
     "/imports", tags=["imports"], status_code=status.HTTP_200_OK
 )
-async def imports(import_: ImportSchema, request: Request):
+async def imports(request_model: RequestImportsSchema, request: Request):
     db: AsyncEngine = request.app.state.db
-
+    
+    import_ = request_model.data
     async with db.begin() as conn:
         rows = prepare_import_rows(import_)
         query = units_table.insert().values(rows)

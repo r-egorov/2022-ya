@@ -86,3 +86,7 @@ class ImportSchema(BaseModel):
 class ErrorSchema(BaseModel):
     code: int = 400
     message: str
+
+
+class RequestImportsSchema(BaseModel):
+    data: ImportSchema

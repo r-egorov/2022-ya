@@ -1,6 +1,8 @@
 import socket
+import asyncio
 
 import pytest
+import pytest_asyncio
 from alembic.command import upgrade
 from sqlalchemy.engine import URL as SaURL
 from sqlalchemy import create_engine
@@ -12,13 +14,13 @@ from yashop.api.__main__ import parser
 from yashop.api.app import create_app
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def migrated_postgres(alembic_config, postgres):
     upgrade(alembic_config, 'head')
     return postgres
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def find_free_port():
     def _find_free_port():
         import socket
@@ -34,7 +36,7 @@ def find_free_port():
     return _find_free_port
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def arguments(find_free_port, migrated_postgres: SaURL):
     return parser.parse_args(
         [
@@ -51,14 +53,21 @@ def arguments(find_free_port, migrated_postgres: SaURL):
     )
 
 
-@pytest.fixture
-async def app(arguments):
+@pytest_asyncio.fixture(scope="session")
+def event_loop():
+    loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest_asyncio.fixture
+async def app(arguments, event_loop):
     app = create_app(arguments)
     async with LifespanManager(app):
         yield app
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def api_client(app):
     async with AsyncClient(
             app=app, base_url="http://test", headers={"Content-Type": "application/json"},
@@ -66,7 +75,7 @@ async def api_client(app):
         yield c
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def migrated_postgres_connection(migrated_postgres):
     engine = create_engine(migrated_postgres)
     conn = engine.connect()
