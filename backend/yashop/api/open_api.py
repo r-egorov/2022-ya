@@ -9,6 +9,7 @@ from yashop.api.schema import ErrorSchema
 def custom_openapi(app: FastAPI):
     if app.openapi_schema:
         return app.openapi_schema
+
     openapi_schema = get_openapi(
         title="yashop",
         version="1.0.0",
@@ -38,4 +39,4 @@ def custom_openapi(app: FastAPI):
     openapi_schemas.pop("ValidationError")
     openapi_schemas.pop("HTTPValidationError")
 
-    return app.openapi_schema
+    return openapi_schema

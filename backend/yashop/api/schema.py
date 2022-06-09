@@ -18,6 +18,7 @@ class ShopUnitImportSchema(BaseModel):
     def name_not_empty(cls, name):
         if len(name) < 1:
             raise ValueError("name must not be empty")
+        return name
 
     @validator('price')
     def price_only_in_offers(cls, price, values):
@@ -32,6 +33,7 @@ class ShopUnitImportSchema(BaseModel):
                 raise ValueError(
                     "price must be positive int, more than one"
                 )
+        return price
 
 
 
@@ -45,6 +47,7 @@ class ImportSchema(BaseModel):
             raise ValueError(
                 "updateDate cannot be in the future"
             )
+        return update_date
 
     @validator('items')
     def unit_ids_unique(cls, units):
@@ -55,7 +58,11 @@ class ImportSchema(BaseModel):
                     f"id {unit.id} is not unique"
                 )
             unit_types.add(unit.id)
+        return units
 
+    # @validator('items')
+    # def parent_ids_only_categories(cls, units):
+    #     raise ValueError("heyo")
 
 class ErrorSchema(BaseModel):
     code: int

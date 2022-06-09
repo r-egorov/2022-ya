@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from fastapi import (
+    APIRouter, Request, Response, status,
+)
 
 from yashop.api.schema import ShopUnitImportSchema, ImportSchema
 
@@ -6,12 +8,9 @@ from yashop.api.schema import ShopUnitImportSchema, ImportSchema
 router = APIRouter()
 
 
-from fastapi.exceptions import HTTPException
-
 @router.post(
-    "/imports", tags=["imports"],
+    "/imports", tags=["imports"], status_code=status.HTTP_200_OK
 )
-async def imports(import_: ImportSchema):
-    print(ImportSchema.schema())
-    raise HTTPException(status_code=400, detail="loh")
-    return({"hello": "world"})
+async def imports(import_: ImportSchema, request: Request):
+
+    return Response(status_code=status.HTTP_200_OK)

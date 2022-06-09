@@ -22,7 +22,7 @@ async def validation_error_handler(request, exc: RequestValidationError):
         code=status.HTTP_400_BAD_REQUEST
     )
     return JSONResponse(
-        content=error.json(),
+        content=jsonable_encoder(error),
         status_code=error.code,
     )
 
