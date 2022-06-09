@@ -7,6 +7,7 @@ from starlette.exceptions import HTTPException
 
 from yashop.utils.pg import create_connect_to_db_task, create_close_db_connection_task
 from yashop.api.handlers import create_main_router
+from yashop.api.open_api import custom_openapi
 from yashop.api.exception_handlers import (
     http_exception_handler,
     validation_error_handler,
@@ -37,5 +38,7 @@ def create_app(args: Namespace) -> FastAPI:
 
     app.add_event_handler("startup", create_connect_to_db_task(app, args))
     app.add_event_handler("shutdown", create_close_db_connection_task(app))
+
+    app.openapi_schema = custom_openapi(app)
 
     return app
