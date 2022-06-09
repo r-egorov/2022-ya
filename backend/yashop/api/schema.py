@@ -14,6 +14,9 @@ class ShopUnitImportSchema(BaseModel):
     type: ShopUnitType
     price: Optional[int]
 
+    class Config:
+        allow_population_by_field_name = True
+
     @validator('name')
     def name_not_empty(cls, name):
         if len(name) < 1:
@@ -39,9 +42,12 @@ class ShopUnitImportSchema(BaseModel):
 
 class ImportSchema(BaseModel):
     items: List[ShopUnitImportSchema]
-    updateDate: datetime
+    update_date: datetime = Field(alias="updateDate")
 
-    @validator('updateDate')
+    class Config:
+        allow_population_by_field_name = True
+
+    @validator('update_date')
     def date_not_future(cls, update_date: datetime):
         if update_date.timestamp() > datetime.now().timestamp():
             raise ValueError(

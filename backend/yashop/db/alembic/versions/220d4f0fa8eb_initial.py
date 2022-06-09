@@ -28,7 +28,7 @@ def upgrade() -> None:
         sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('name', sa.String(), nullable=False),
         sa.Column('unit_code', sa.String(), nullable=False),
-        sa.Column('date', sa.DateTime(), nullable=False),
+        sa.Column('date', sa.DateTime(timezone=True), nullable=False),
         sa.Column('parent_id', postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column('type', ShopUnitType, nullable=False),
         sa.Column('price', sa.Integer(), nullable=True),

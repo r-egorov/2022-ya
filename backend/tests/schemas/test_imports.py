@@ -68,7 +68,7 @@ class TestImportSchemas:
         offer = generate_unit_dict(id_=uuid.uuid4(), type_='OFFER')
 
         import_schema = ImportSchema(
-            updateDate=upd_date,
+            update_date=upd_date,
             items=[category, offer],
         )
 
@@ -79,7 +79,7 @@ class TestImportSchemas:
         offer = generate_unit_dict(id_=uuid.uuid4(), type_='OFFER')
         with pytest.raises(ValidationError, match='updateDate cannot be in the future'):
             ImportSchema(
-                updateDate=future,
+                update_date=future,
                 items=[category, offer],
             )
 
@@ -92,7 +92,7 @@ class TestImportSchemas:
 
         with pytest.raises(ValidationError, match=f'id {id_} is not unique'):
             ImportSchema(
-                updateDate=upd_date,
+                update_date=upd_date,
                 items=[category, offer],
             )
     
@@ -106,7 +106,7 @@ class TestImportSchemas:
 
         with pytest.raises(ValidationError, match='only categories can be parents'):
             ImportSchema(
-                updateDate=upd_date,
+                update_date=upd_date,
                 items=[category, offer, child_offer],
             )
         

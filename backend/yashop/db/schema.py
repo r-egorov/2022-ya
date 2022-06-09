@@ -24,7 +24,7 @@ units_table = Table(
     Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     Column("name", String, nullable=False),
     Column("unit_code", String, nullable=False),
-    Column("date", DateTime, nullable=False),
+    Column("date", DateTime(timezone=True), nullable=False),
     Column("parent_id", UUID(as_uuid=True), ForeignKey("units.id"), nullable=True),
     Column("type", PgEnum(ShopUnitType, name="type"), nullable=False),
     Column("price", Integer, nullable=True),
