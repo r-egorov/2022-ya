@@ -1,6 +1,20 @@
 version: '3.8'
 
 services:
+#  server:
+#    build:
+#      context: ./backend
+#      dockerfile: Dockerfile
+#    volumes:
+#      - ./backend/:/backend/
+#    command: uvicorn yashop.api.app:create_app --factory --reload --workers 1 --host 0.0.0.0 --port 8000
+#    env_file:
+#      - ./backend/.env
+#    ports:
+#      - 8080:8080
+#    depends_on:
+#      - db
+
   db:
     image: postgres:13-alpine
     volumes:
