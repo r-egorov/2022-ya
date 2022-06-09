@@ -27,10 +27,10 @@ def generate_unit_dict(
 class TestImportSchemas:
     @staticmethod
     def assert_eq_unit_dict_and_schema(unit_dict, unit_schema: ShopUnitImportSchema):
-        unit_schema_parentId = unit_schema.parentId if unit_schema is not None else None
+        unit_schema_parent_id = str(unit_schema.parent_id) if unit_schema is not None else None
         assert unit_dict['id'] == str(unit_schema.id)
         assert unit_dict['name'] == unit_schema.name
-        assert unit_dict['parentId'] == unit_schema_parentId
+        assert unit_dict['parentId'] == unit_schema_parent_id
         assert unit_dict['type'] == str(unit_schema.type.value)
         assert unit_dict['price'] == unit_schema.price
 
@@ -52,8 +52,9 @@ class TestImportSchemas:
             ShopUnitImportSchema(**unit)
 
     def test_shop_unit_import_schema_ok(self):
-        offer = generate_unit_dict(name='offer')
-        category = generate_unit_dict(name='category', type_='CATEGORY', price=None)
+        offer = generate_unit_dict(name='offer', parent_id=uuid.uuid4())
+        category = generate_unit_dict(name='category', type_='CATEGORY',
+                                      price=None, parent_id=uuid.uuid4())
         offer_schema = ShopUnitImportSchema(**offer)
         category_schema = ShopUnitImportSchema(**category)
 

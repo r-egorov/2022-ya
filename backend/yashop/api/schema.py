@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Field
 
 from yashop.db.schema import ShopUnitType
 
@@ -10,7 +10,7 @@ from yashop.db.schema import ShopUnitType
 class ShopUnitImportSchema(BaseModel):
     id: UUID
     name: str
-    parentId: Optional[UUID]
+    parent_id: Optional[UUID] = Field(alias="parentId")
     type: ShopUnitType
     price: Optional[int]
 
@@ -66,8 +66,8 @@ class ImportSchema(BaseModel):
         parent_ids = set()
         for unit in units:
             units_types[unit.id] = unit.type
-            if unit.parentId is not None:
-                parent_ids.add(unit.parentId)
+            if unit.parent_id is not None:
+                parent_ids.add(unit.parent_id)
         for parent_id in parent_ids:
             if parent_id in units_types:
                 if units_types[parent_id] == ShopUnitType.OFFER:
